@@ -1,9 +1,6 @@
-package delivery
+package delivery_http
 
 import (
-	"database/sql"
-	"fmt"
-	"go-todo/repository"
 	"go-todo/usecase"
 	"net/http"
 	"strconv"
@@ -11,59 +8,55 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TodoHandler struct {
-	service *usecase.TodoService
+type DeliveryHTTP struct {
+	usecase *usecase.Usecase
 }
 
-func NewTodoHandler(db *sql.DB) *TodoHandler {
-	repo := repository.NewTodoRepository(db)
-	service := usecase.NewTodoService(repo)
-	return &TodoHandler{service: service}
+func NewHTTP(usecase *usecase.Usecase) *DeliveryHTTP {
+	return &DeliveryHTTP{usecase: usecase}
 }
 
-func (h *TodoHandler) ListTodos(c *gin.Context) {
-	todos, err := h.service.GetAllTodos()
+func (d *DeliveryHTTP) ListTodos(c *gin.Context) {
+	todos, err := d.usecase.GetAllTodos()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve todos"})
 		return
 	}
 
-	fmt.Println(todos)
-
 	c.HTML(http.StatusOK, "index.html", gin.H{"todos": todos})
 }
 
-func (h *TodoHandler) CreateTodo(c *gin.Context) {
+func (d *DeliveryHTTP) CreateTodo(c *gin.Context) {
 	title := c.PostForm("title")
 	if title == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Title cannot be empty"})
 		return
 	}
 
-	if err := h.service.AddTodo(title); err != nil {
+	if err := d.usecase.AddTodo(title); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create todo"})
 		return
 	}
 
-	h.ListTodos(c)
+	d.ListTodos(c)
 }
 
-func (h *TodoHandler) ToggleTodo(c *gin.Context) {
+func (d *DeliveryHTTP) ToggleTodo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	if err := h.service.ToggleTodoStatus(id); err != nil {
+	if err := d.usecase.ToggleTodoStatus(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not toggle todo"})
 		return
 	}
 
-	h.ListTodos(c)
+	d.ListTodos(c)
 }
 
-func (h *TodoHandler) DeleteTodo(c *gin.Context) {
+func (d *DeliveryHTTP) DeleteTodo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	if err := h.service.RemoveTodoByID(id); err != nil {
+	if err := d.usecase.RemoveTodoByID(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete todo"})
 		return
 	}
 
-	h.ListTodos(c)
+	d.ListTodos(c)
 }

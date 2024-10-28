@@ -2,29 +2,29 @@ package usecase
 
 import (
 	"go-todo/models"
-	repositories "go-todo/repository"
+	repository "go-todo/repository"
 )
 
-type TodoService struct {
-	repo *repositories.TodoRepository
+type Usecase struct {
+	repo *repository.Repo
 }
 
-func NewTodoService(repo *repositories.TodoRepository) *TodoService {
-	return &TodoService{repo: repo}
+func NewTodoUsecase(repo *repository.Repo) *Usecase {
+	return &Usecase{repo: repo}
 }
 
-func (s *TodoService) GetAllTodos() ([]models.Todo, error) {
-	return s.repo.FindAll()
+func (u *Usecase) GetAllTodos() ([]models.Todo, error) {
+	return u.repo.FindAll()
 }
 
-func (s *TodoService) AddTodo(title string) error {
-	return s.repo.Create(title)
+func (u *Usecase) AddTodo(title string) error {
+	return u.repo.Create(title)
 }
 
-func (s *TodoService) ToggleTodoStatus(id int) error {
-	return s.repo.Toggle(id)
+func (u *Usecase) ToggleTodoStatus(id int) error {
+	return u.repo.Toggle(id)
 }
 
-func (s *TodoService) RemoveTodoByID(id int) error {
-	return s.repo.Delete(id)
+func (u *Usecase) RemoveTodoByID(id int) error {
+	return u.repo.Delete(id)
 }
