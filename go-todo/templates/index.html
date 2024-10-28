@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <form hx-post="/todos" hx-target="#todo-list" hx-swap="outerHTML">
+        <input type="text" name="title" placeholder="New Todo" required>
+        <button type="submit">Add</button>
+    </form>
+    <div id="todo-list">
+        {{range .todos}}
+            <div>
+                <span style="text-decoration: {{if .Completed}}line-through{{else}}none{{end}}">{{.Description}}</span>
+                <button hx-post="/todos/{{.ID}}/toggle" hx-target="#todo-list" hx-swap="outerHTML">Toggle</button>
+                <button hx-post="/todos/{{.ID}}/delete" hx-target="#todo-list" hx-swap="outerHTML">Delete</button>
+            </div>
+        {{end}}
+    </div>
+</body>
+</html>
